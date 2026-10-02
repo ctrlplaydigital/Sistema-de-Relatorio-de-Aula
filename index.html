@@ -112,9 +112,9 @@ function cabecalho(f){
 function gerar(f){
   if(f.dataset.kind==="aula"){
     const casa=f.casaTipo.value==="custom"?f.casaTexto.value.trim():CASA_PADRAO;
-    return `${cabecalho(f)}\n🛠 Ferramenta: ${f.ferramenta.value.trim()}\n🎯 Objetivos da aula: ${f.objetivos.value.trim()}\n\n\n🏆 Para Casa:\n${casa}\n\n❓Qualquer dúvida entre em contato com a secretaria de sua escola. 🚀`;
+    return `${cabecalho(f)}\n🛠 Ferramenta: ${f.ferramenta.value.trim()}\n\n🎯 Objetivos da aula: \n${f.objetivos.value.trim()}\n\n🏆 Para Casa:\n${casa}\n\n❓Qualquer dúvida entre em contato com a secretaria de sua escola. 🚀`;
   }
-  return `${cabecalho(f)}\n⚠️ AVISO AOS PAIS E RESPONSÁVEIS ⚠️\nNa aula de hoje, nenhum aluno esteve presente. \nPor isso, o(a) professor(a) gravou um passo a passo da atividade que seria realizada. \nÉ muito importante que os alunos assistam à gravação durante a semana e realizem a atividade proposta, para que possam acompanhar o conteúdo da próxima aula.\nContamos com o apoio de todos para que as aulas aconteçam da melhor maneira possível. 🚀\n\n❓Qualquer dúvida entre em contato com a secretaria de sua escola. 🚀`;
+  return `${cabecalho(f)}\n⚠️ AVISO AOS PAIS E RESPONSÁVEIS ⚠️\n\nNa aula de hoje, nenhum aluno esteve presente. \nPor isso, o(a) professor(a) gravou um passo a passo da atividade que seria realizada. \nÉ muito importante que os alunos assistam à gravação durante a semana e realizem a atividade proposta, para que possam acompanhar o conteúdo da próxima aula.\nContamos com o apoio de todos para que as aulas aconteçam da melhor maneira possível. 🚀\n\n❓Qualquer dúvida entre em contato com a secretaria de sua escola. 🚀`;
 }
 
 $$("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
