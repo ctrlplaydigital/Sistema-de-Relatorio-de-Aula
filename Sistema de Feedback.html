@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gerador de Relatório de Aula</title>
+<style>
+:root{--bg:#171a23;--card:#1b212d;--field:#2d3748;--line:#3a4252;--accent:#4299e1;--title:#7cc4f5;--text:#e8edf5;--muted:#7b8494;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:24px 16px}
+.card{width:100%;max-width:680px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:40px}
+.wide{max-width:960px}
+h1{margin:40px 0 0;text-align:center;color:var(--title);font-size:2rem;padding-bottom:16px;border-bottom:2px solid var(--accent)}
+.menu{display:grid;gap:20px;margin-top:40px}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:18px;font-weight:600;font-size:1rem}
+.btn:hover{background:#3182ce}
+.back{background:none;border:0;color:var(--text);font-weight:600;padding:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px 26px;margin-top:40px}
+.full{grid-column:1/-1}
+label{display:block;color:var(--title);font-weight:600;font-size:.85rem;margin-bottom:8px}
+input,textarea,select{width:100%;background:var(--field);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font:inherit;font-size:.9rem}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+textarea{min-height:80px;resize:vertical}
+:focus-visible{outline:2px solid var(--title);outline-offset:2px}
+.actions{text-align:center;margin-top:36px}
+.actions .btn{padding:12px 20px;font-size:.9rem}
+.out{margin-top:32px}
+.out pre{white-space:pre-wrap;word-break:break-word;background:var(--field);border:1px solid var(--line);border-radius:6px;padding:16px;font:inherit;line-height:1.5;margin:0 0 16px}
+.hidden{display:none}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.card{padding:24px}}
+</style>
+</head>
+<body>
+
+<main id="menu" class="card">
+  <h1>Gerador de Relatório de Aula</h1>
+  <div class="menu">
+    <button class="btn" data-go="f1">Gerar Relatório de Aula Padrão</button>
+    <button class="btn" data-go="f2">Gerar Relatório de Aula Sem Alunos Presentes</button>
+  </div>
+</main>
+
+<main id="f1" class="card wide hidden">
+  <button class="back" data-go="menu">← Voltar</button>
+  <h1>Relatório de Aula Padrão</h1>
+  <form class="grid" data-kind="aula">
+    <div><label>Turma:</label><input name="turma" placeholder="Ex: 222 - CYO2 / TERÇA / 14:00 / Ingrid Liana"></div>
+    <div><label>Data:</label><input name="data" type="date"></div>
+    <div class="full"><label>Link da aula:</label><input name="link"></div>
+    <div><label>Professor(a):</label><input name="prof"></div>
+    <div><label>Ferramenta:</label><input name="ferramenta" placeholder="Ex: HTML e CSS"></div>
+    <div class="full"><label>Objetivos da aula:</label><textarea name="objetivos"></textarea></div>
+    <div class="full"><label>Para Casa:</label>
+      <select name="casaTipo">
+        <option value="padrao">Texto Padrão</option>
+        <option value="custom">Texto Personalizado</option>
+      </select>
+    </div>
+    <div class="full hidden" id="casaCustom"><label>Texto para casa:</label><textarea name="casaTexto"></textarea></div>
+    <div class="full actions"><button type="submit" class="btn">Gerar Feedback</button></div>
+  </form>
+  <div class="out hidden"><pre></pre><button class="btn copy">Copiar texto</button></div>
+</main>
+
+<main id="f2" class="card wide hidden">
+  <button class="back" data-go="menu">← Voltar</button>
+  <h1>Relatório de Aula Sem Alunos Presentes</h1>
+  <form class="grid" data-kind="sem">
+    <div><label>Turma:</label><input name="turma" placeholder="Ex: 222 - CYO2 / TERÇA / 14:00 / Ingrid Liana"></div>
+    <div><label>Data:</label><input name="data" type="date"></div>
+    <div><label>Link da aula:</label><input name="link"></div>
+    <div><label>Professor(a):</label><input name="prof"></div>
+    <div class="full actions"><button type="submit" class="btn">Gerar Feedback</button></div>
+  </form>
+  <div class="out hidden"><pre></pre><button class="btn copy">Copiar texto</button></div>
+</main>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const CASA_PADRAO="O aluno pode acessar o portal e realizar as atividades para casa da aula atual e também das anteriores, qualquer dúvida, anotar e trazer na próxima semana.";
+const MESES=["jan.","fev.","mar.","abr.","mai.","jun.","jul.","ago.","set.","out.","nov.","dez."];
+
+function fmtData(v){
+  if(!v) return "";
+  const [a,m,d]=v.split("-");
+  return `${d} de ${MESES[+m-1]} de ${a}`;
+}
+function hoje(){
+  const t=new Date(), p=n=>String(n).padStart(2,"0");
+  return `${t.getFullYear()}-${p(t.getMonth()+1)}-${p(t.getDate())}`;
+}
+function go(id){
+  ["menu","f1","f2"].forEach(i=>$("#"+i).classList.toggle("hidden",i!==id));
+  window.scrollTo(0,0);
+}
+function cabecalho(f){
+  return `📌 Turma: ${f.turma.value.trim()}\n📅 Data: ${fmtData(f.data.value)}\n🎬 Link da aula: ${f.link.value.trim()}\n📙 Professor(a): ${f.prof.value.trim()}\n`;
+}
+function gerar(f){
+  if(f.dataset.kind==="aula"){
+    const casa=f.casaTipo.value==="custom"?f.casaTexto.value.trim():CASA_PADRAO;
+    return `${cabecalho(f)}\n🛠 Ferramenta: ${f.ferramenta.value.trim()}\n\n🎯 Objetivos da aula: \n${f.objetivos.value.trim()}\n\n🏆 Para Casa:\n${casa}\n\n❓Qualquer dúvida entre em contato com a secretaria de sua escola. 🚀`;
+  }
+  return `${cabecalho(f)}\n⚠️ AVISO AOS PAIS E RESPONSÁVEIS ⚠️\n\nNa aula de hoje, nenhum aluno esteve presente. \nPor isso, o(a) professor(a) gravou um passo a passo da atividade que seria realizada. \nÉ muito importante que os alunos assistam à gravação durante a semana e realizem a atividade proposta, para que possam acompanhar o conteúdo da próxima aula.\nContamos com o apoio de todos para que as aulas aconteçam da melhor maneira possível. 🚀\n\n❓Qualquer dúvida entre em contato com a secretaria de sua escola. 🚀`;
+}
+
+$$("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+$$("input[type=date]").forEach(i=>i.value=hoje());
+$("select[name=casaTipo]").addEventListener("change",e=>$("#casaCustom").classList.toggle("hidden",e.target.value!=="custom"));
+
+$$("form").forEach(f=>{
+  f.addEventListener("submit",e=>{
+    e.preventDefault();
+    const out=f.parentElement.querySelector(".out");
+    out.querySelector("pre").textContent=gerar(f);
+    out.classList.remove("hidden");
+    out.scrollIntoView({behavior:"smooth",block:"nearest"});
+  });
+});
+$$(".copy").forEach(b=>b.addEventListener("click",async()=>{
+  const txt=b.parentElement.querySelector("pre").textContent;
+  try{await navigator.clipboard.writeText(txt)}catch(_){
+    const r=document.createRange();r.selectNodeContents(b.parentElement.querySelector("pre"));
+    const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand("copy");
+  }
+  b.textContent="Copiado!";setTimeout(()=>b.textContent="Copiar texto",1500);
+}));
+</script>
+</body>
+</html>
